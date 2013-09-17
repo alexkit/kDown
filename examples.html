@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <title>kDown.js | Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="kDown - A little engine to power your keyboard-centric applications">
+  <meta name="author" content="Alex Duloz">  
+  <style>
+  * {
+	margin:0;
+	padding:0
+}
+
+
+body {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	background: #fff;
+	font-size: 20px;
+	line-height: 1.5;
+ 	color: #333;
+	overflow-y: scroll;
+	}
+
+html,body{ 
+	height:100%; 
+}
+
+.container {
+	max-width: 900px;
+	width: 100%;
+	min-width: 480px;
+	margin: 50px auto;
+}
+
+h1 {
+	margin-bottom: .6em;
+	}
+h2 {
+	margin-top: 2em;
+	margin-bottom: 1em;
+	border-bottom: 2px dotted #777;
+	}
+
+h3 {
+	margin-top: 2em;
+	/*margin-bottom: .6em;	*/
+}
+
+textarea {
+	width: 100%;
+	margin-bottom: 2em;
+	}
+p {
+	margin-bottom: 20px;
+}
+	
+ pre {
+	 background: rgba(0,0,0,0.8);
+	 border-radius: 5px;
+	 margin: 1.5em auto 4em auto;
+	 position: relative;
+	 font-size: .8em;
+	 padding: 1em;
+	 position: relative;
+	 }
+
+  code {
+ 	border: 1px solid #ddd;
+ 	background: white;
+ 	border-radius: 5px;
+ 	padding: 3px;
+ 	}
+ 
+ pre code {
+  	color: white;
+  	border: none;
+  	background: transparent;
+ 	}
+ 	
+ h2 code {
+ 	border: 0;
+ }
+ 
+ kbd {
+ 	background: transparent;
+	display: inline-block;
+	min-width: 1.2em;
+	margin: .1em;
+	padding: .2em;
+	border: .2px solid #99cbce;
+	border-radius: .3em;
+	text-align: center;
+	line-height: 1;
+	}
+
+ kbd:hover {
+	cursor: help;
+ }
+ 
+ a kbd:hover {
+ 	cursor: inherit;
+ 	}
+ 
+ a {
+	color: #e13300;
+	text-decoration: none;
+	transition: all .2s;
+	position: relative;
+	text-shadow: 0 0 #fff;
+	padding: 0 1px;
+	}
+
+ a:hover {
+	color: white;
+	border-radius: .2em;
+ 	background: #e13300;
+	}
+
+.contentinfo {
+	text-align: center;
+	}
+
+.some-air {
+	margin-top: 2em;
+	}
+
+  </style>
+</head>
+
+<body class="container">  
+
+<h1>kDown.js - Examples</h1>
+
+<p>
+	<i>Open your console, and watch <a href="https://github.com/alexduloz/kDown">kDown.js</a> in action</i>
+</p>
+
+<h2>The <code>whenShortcut</code> method</h2>
+
+<p>
+	The <code>whenShortcut</code> method is used when you want to listen to shortcuts (zero, one or more modifiers + <b>one</b> "regular" key).
+</p>
+
+<ul>
+
+
+
+<li>
+<h3>Press <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>shift</kbd> + <kbd>a</kbd></h3>
+<pre>
+<code>
+kDown.whenShortcut(&quot;ctrl+alt+shift+a&quot;,function(){
+    console.log(&quot;ctrl+alt+shift+a&quot;);
+});
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press <kbd>cmd</kbd> + <kbd>alt</kbd> + <kbd>shift</kbd> + <kbd>b</kbd></h3>
+<p>If you don't have a Mac, you can replace <kbd>cmd</kbd> with <kbd>ctrl</kbd> since <code>kDown.cmdOrCtrl(true)</code> is the default behavior.</p>
+<pre>
+<code>
+kDown.whenShortcut(&quot;cmd+alt+shift+b&quot;,function(){
+    console.log(&quot;cmd+alt+shift+b&quot;);
+});
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press <kbd>ctrl</kbd> + <kbd>m</kbd> or <kbd>n</kbd> or <kbd>o</kbd></h3>
+<pre>
+<code>
+kDown.whenShortcut([&quot;ctrl&quot;,[&quot;m&quot;,&quot;n&quot;,&quot;o&quot;]],function(){
+    console.log(&quot;ctrl+m|n|o&quot;);
+});
+</code>
+</pre>
+</li>
+
+
+<li>
+<h3>Press <kbd>enter</kbd> inside and outside textareas</h3>
+<div class="some-air">
+<p><code>#textarea1</code></p>
+<textarea id="textarea1"></textarea>
+<p><code>#textarea2</code></p>
+<textarea id="textarea2"></textarea>
+</div>
+<pre>
+<code>
+kDown.whenShortcut(&quot;enter&quot;,function(e){
+    console.log(&quot;enter inside #textarea1&quot;);
+    console.log(e.target);
+    },document.getElementById(&quot;textarea1&quot;));
+    
+    kDown.whenShortcut(&quot;enter&quot;,function(){
+        console.log(&quot;enter inside #textarea2&quot;);
+    },document.getElementById(&quot;textarea2&quot;));
+    
+    kDown.whenShortcut(&quot;enter&quot;,function(){
+        console.log(&quot;enter inside a textarea&quot;);
+    },document.getElementsByTagName(&quot;textarea&quot;));
+    
+    kDown.whenShortcut(&quot;enter&quot;,function(){
+        console.log(&quot;enter was pressed outside textareas&quot;);
+    },document.getElementsByTagName(&quot;body&quot;)[0]);
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press <kbd>e</kbd> or <kbd>f</kbd> or <kbd>g</kbd></h3>
+<pre>
+<code>
+kDown.whenDown([[&quot;x&quot;,&quot;y&quot;,&quot;z&quot;]],function(){
+    console.log(&quot;when down: x|y|z&quot;);
+});
+</code>
+</pre>
+</li>
+
+</ul>
+
+<h2>The <code>whenDown</code> method</h2>
+
+<p>
+	The <code>whenDown</code> method is used when you want to listen to more complex key combinations.
+</p>
+
+<ul>
+
+<li>
+<h3>Press <kbd>m</kbd>+<kbd>n</kbd>+<kbd>o</kbd></h3>
+<pre>
+<code>
+kDown.whenDown([[&amp;quot;x&amp;quot;,&amp;quot;y&amp;quot;,&amp;quot;z&amp;quot;]],function(){
+    console.log(&amp;quot;when down: x|y|z&amp;quot;);
+});
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press <kbd>a</kbd> and <kbd>x</kbd>, <kbd>y</kbd> or <kbd>z</kbd></h3>
+<pre>
+<code>
+kDown.whenDown([&quot;a&quot;,[&quot;x&quot;,&quot;y&quot;,&quot;z&quot;]],function(){
+    console.log(&quot;when down: a+x|y|z&quot;);
+});
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press <kbd>esc</kbd></h3>
+<pre>
+<code>
+kDown.whenDown(&quot;esc&quot;,function(){
+    console.log(&quot;escape with 'esc'&quot;);
+});
+
+// aliased string
+kDown.whenDown(&quot;escape&quot;,function(){
+    console.log(&quot;escape with 'escape'&quot;);
+});
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press the <kbd>&darr;</kbd> key (down arrow) to see a single key code used, and the optional <code>event</code> argument in action</h3>
+<pre>
+<code>
+kDown.whenDown(40,function(event){
+    console.log(&quot;down arrow with one single keyCode: &quot; + event.which);
+});
+</code>
+</pre>
+</li>
+
+</ul>
+
+<h2>The <code>isShortcut</code> and <code>isDown</code> methods</h2>
+
+<p>
+	The <code>isShortcut</code> and <code>isDown</code> methods are used internally by the <code>whenShortcut</code> and <code>whenDown</code> methods. If you want, you can use them directly in event handlers.
+</p>
+
+<ul>
+
+<li>
+<h3>Press <kbd>e</kbd> or <kbd>f</kbd> or <kbd>g</kbd></h3>
+<pre>
+<code>
+document.addEventListener(&quot;keydown&quot;,function(event){
+    if(kDown.isShortcut([[&quot;e&quot;,&quot;f&quot;,&quot;g&quot;]])) {
+        console.log(&quot;is shortcut: e|f|g&quot;);
+    }
+},true);
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press <kbd>alt</kbd> + <kbd>q</kbd> or <kbd>r</kbd> or <kbd>s</kbd></h3>
+<pre>
+<code>
+document.addEventListener(&quot;keydown&quot;,function(event){
+    if(kDown.isShortcut([&quot;alt&quot;,[&quot;q&quot;,&quot;r&quot;,&quot;s&quot;]])) {
+        console.log(&quot;is shortcut: alt+q|r|s&quot;);
+    }
+},true);
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press <kbd>alt</kbd> + <kbd>&darr;</kbd></h3>
+<pre>
+<code>
+document.addEventListener(&quot;keydown&quot;,function(event){
+    if(kDown.isDown(&quot;alt+down&quot;)) {
+        console.log(&quot;a string&quot;);
+    }
+    
+    if(kDown.isDown([&quot;alt&quot;,&quot;down&quot;])) {
+        console.log(&quot;an array (strings)&quot;);
+    }
+    	
+    if(kDown.isDown([&quot;alt&quot;,40])) {
+        console.log(&quot;an array (string and keyCode)&quot;);
+    }
+    	
+    if(kDown.isDown([18,40])) {
+        console.log(&quot;an array (keyCodes)&quot;);
+    }
+},true);
+</code>
+</pre>
+</li>
+
+
+</ul>
+
+<div class="contentinfo">
+<p>
+	Coded with delight by <a href="https://twitter.com/alexduloz">@alexduloz</a>
+</p>
+<p>
+	<a href="https://github.com/alexduloz/kDown">Github Project</a>
+</p>
+</div>
+</body>    
+    <script src="kDown.js"></script>
+    <script>
+
+    kDown.whenShortcut("ctrl+alt+shift+a",function(){
+    	console.log("ctrl+alt+shift+a");
+    });
+   
+   
+    kDown.whenShortcut("cmd+alt+shift+b",function(){
+    	console.log("cmd+alt+shift+b");
+    });
+
+
+    kDown.whenShortcut(["ctrl",["m","n","o"]],function(){
+    	console.log("ctrl+m|n|o");
+    });
+
+
+    kDown.whenShortcut("enter",function(e){
+    	console.log("enter inside #textarea1");
+    	console.log(e.target);
+    },document.getElementById("textarea1"));
+    
+    
+    kDown.whenShortcut("enter",function(){
+    	console.log("enter inside #textarea2");
+    },document.getElementById("textarea2"));
+    
+    
+    kDown.whenShortcut("enter",function(){
+    	console.log("enter inside a textarea");
+    },document.getElementsByTagName("textarea"));
+    
+    
+    kDown.whenShortcut("enter",function(){
+    	console.log("enter was pressed outside textareas");
+    },document.getElementsByTagName("body")[0]);
+    
+    
+    kDown.whenDown(["a",["x","y","z"]],function(){
+    	console.log("when down: a+x|y|z");
+    });
+    
+    
+    kDown.whenDown("m+n+o",function(event){
+		console.log("m+n+o");
+	});
+    
+    
+    kDown.whenDown("esc",function(){
+    	console.log("escape with 'esc'");
+    });
+    
+    
+    kDown.whenDown("escape",function(){
+    	console.log("escape with 'escape'");
+    });
+    
+    
+    kDown.whenDown(40,function(event){
+		console.log("down arrow with one single keyCode: " + event.which);
+	});
+	
+	
+	
+    
+    document.addEventListener("keydown",function(event){
+	    
+	    //console.log( kDown.countKeys() );
+	    
+	    //console.log( kDown.getKeys() );
+	    
+	    if(kDown.isShortcut([["e","f","g"]])) {
+    		console.log("is shortcut: e|f|g");
+    	}
+    	
+    	if(kDown.isShortcut(["alt",["q","r","s"]])) {
+    		console.log("is shortcut: alt+q|r|s");
+    	}
+    	
+    	if(kDown.isDown("alt+down")) {
+    		console.log("a string");
+    	}
+    	if(kDown.isDown(["alt","down"])) {
+    		console.log("an array (strings)");
+    	}
+    	
+    	if(kDown.isDown(["alt",40])) {
+    		console.log("an array (string and keyCode)");
+    	}
+    	
+    	if(kDown.isDown([18,40])) {
+    		console.log("an array (keyCodes)");
+    	}
+
+    },true);
+
+    
+    </script>
+</body>
+</html>
