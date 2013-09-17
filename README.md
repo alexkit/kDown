@@ -4,25 +4,26 @@ A little engine to power your keyboard-centric applications.
 
 No dependency, no third-party library required. Just load kDown, and you're done.
 
-> <script scr="path/to/kDown.js"></script>
+    <script scr="path/to/kDown.js"></script>
 
+[View examples](http://alexduloz.github.io/kDown/examples.html)
 
 ## API
 
-### ´.whenShortcut( keys, callback[, context] )´
+### `.whenShortcut( keys, callback[, context] )`
 
-Fires ´callback´ when targeted ´keys´ are down. 
+Fires `callback` when targeted `keys` are down. 
 
-The ´whenShortcut´ method should be used only to listen to, well, shortcuts (zero, one or more modifiers + _one_ regular key).
+The `whenShortcut` method should be used only to listen to, well, shortcuts (zero, one or more modifiers + _one_ regular key).
 
 #### Arguments
 
-* ´keys´ can be one of the following:
+* `keys` can be one of the following:
     * a "+" delimited string ( "alt+a" )
-    * an array of strings and/or key codes and/or arrays ( ["alt","shift","a"], ["alt","shift",65], [18,16,65], [18,"shift",65], ["alt",["a","b","c"]] (which means "alt" + either "a" or "b" or "c") )
+    * an array of strings and/or key codes and/or arrays ( ["alt","shift","a"], ["alt","shift",65], [18,16,65], [18,"shift",65], [ "alt",["a","b","c"]] (which means "alt" + either "a" or "b" or "c") )
     * a single key code ( 65 ) (works only if you're targeting one specific key)
-* ´callback´ accepts one argument: the ´event´ object.
-* ´context´ is an HTML Object. Useful when you want to fire ´callback´ only in specific contexts.
+* `callback` accepts one argument: the `event` object.
+* `context` is an HTML Object. Useful when you want to fire `callback` only in specific contexts.
 
 #### Examples
 
@@ -48,7 +49,7 @@ It is possible to embed an array within an array. In this case, the embedded arr
         console.log("shift + [ c or d or e ]");
     });
 
-You can limit the firing of ´callback´ to a specifc DOM context using the option ´context´ argument:
+You can limit the firing of `callback` to a specifc DOM context using the option `context` argument:
 
     kDown.whenShortcut("alt+esc",function(){
         console.log("works only in textareas");
@@ -56,26 +57,26 @@ You can limit the firing of ´callback´ to a specifc DOM context using the opti
     
 #### Note
 
-The implementation of the Mac "command" key is quite unfriendly and makes it problematic to count how many keys are down. A combo with more than one "regular" key like "alt+b+c" will not work with the ´whenShortcut´ method. The ´whenDown´ method, on the other hand, can count keys and is ok with complex combos. You should avoid using the Mac <kbd>cmd</kbd> key with ´whenDown´, though.
+The implementation of the Mac "command" key is quite unfriendly and makes it problematic to count how many keys are down. A combo with more than one "regular" key like "alt+b+c" will not work with the `whenShortcut` method. The `whenDown` method, on the other hand, can count keys and is ok with complex combos. You should avoid using the Mac <kbd>cmd</kbd> key with `whenDown`, though.
 
 More on that subject: 
 <http://bitspushedaround.com/on-a-few-things-you-may-not-know-about-the-hellish-command-key-and-javascript-events>
 <http://codepen.io/alexduloz/pen/nteqG>
    
-### ´.whenDown( keys, callback[, context] )´
+### `.whenDown( keys, callback[, context] )`
 
-Fires ´callback´ when targeted ´keys´ are down.
+Fires `callback` when targeted `keys` are down.
 
-The ´whenDown´ method is preferred to the ´whenShortcut´ method when you need to react to combos that are not shortcuts (see the ´whenShortcut´ method for more info).
+The `whenDown` method is preferred to the `whenShortcut` method when you need to react to combos that are not shortcuts (see the `whenShortcut` method for more info).
 
 #### Arguments
 
-* ´keys´ can be one of the following:
+* `keys` can be one of the following:
     * a "+" delimited string ( "a+b+c" )
     * an array of strings and/or key codes and/or arrays ( ["a","b","c"], ["a","b",67], [65,66,67], [65,"b",67], ["alt",["a","b","c"]] (which means "alt" + either "a" or "b" or "c") )
     * a single key code ( 65 ) (works only if you're targeting one specific key)
-* ´callback´ accepts one argument: the ´event´ object.
-* ´context´ is an HTML Object. Useful when you want to fire ´callback´ only in specific contexts.
+* `callback` accepts one argument: the `event` object.
+* `context` is an HTML Object. Useful when you want to fire `callback` only in specific contexts.
 
 #### Examples
 
@@ -101,16 +102,16 @@ It is possible to embed an array within an array. In this case, the embedded arr
         console.log("a + b + [ c or d or e ]");
     });
 
-You can limit the firing of ´callback´ to a specifc DOM context using the option ´context´ argument:
+You can limit the firing of `callback` to a specifc DOM context using the option `context` argument:
 
     kDown.whenDown("enter",function(){
         console.log("'enter' was pressed inside textareas");
     },document.getElementsByTagName("textarea"));
 
 
-### ´.isShortcut( keys[, event] )´
+### `.isShortcut( keys[, event] )`
 
-Behaves like ´whenShortcut´, but inside an event handler, and without a callback.
+Behaves like `whenShortcut`, but inside an event handler, and without a callback.
 
 #### Example
 
@@ -120,11 +121,11 @@ Behaves like ´whenShortcut´, but inside an event handler, and without a callba
         }
     },true);
 
-kDown has an internal ´event´ object which is used by the ´isShortcut´ method. If you want to use your own ´event´ object, you can simply pass it as the second argument of the method.
+kDown has an internal `event` object which is used by the `isShortcut` method. If you want to use your own `event` object, you can simply pass it as the second argument of the method.
 
-### ´.isDown( keys[, event] )´
+### `.isDown( keys[, event] )`
 
-Behaves like ´whenDown´, but inside an event handler, and without a callback.
+Behaves like `whenDown`, but inside an event handler, and without a callback.
 
 #### Example
 
@@ -134,9 +135,9 @@ Behaves like ´whenDown´, but inside an event handler, and without a callback.
         }
     },true);
 
-kDown has an internal ´event´ object which is used by the ´isDown´ method. If you want to use your own ´event´ object, you can simply pass it as the second argument of the method.
+kDown has an internal `event` object which is used by the `isDown` method. If you want to use your own `event` object, you can simply pass it as the second argument of the method.
 
-### ´.countKeys()´
+### `.countKeys()`
 
 Returns the number of keys that are down.
 
@@ -146,7 +147,7 @@ Returns the number of keys that are down.
         console.log(kDown.countKeys());
     },true);
 
-### ´.getKeys()´
+### `.getKeys()`
 
 Returns an array of key codes of the keys that are down.
 
@@ -157,37 +158,37 @@ Returns an array of key codes of the keys that are down.
     },true);
 
 
-### ´.ignoreInput( yesOrNope )´
+### `.ignoreInput( yesOrNope )`
 
 Tells kDown not to discard combos fired in input fields and textareas. 
 
-´yesOrNope´: boolean (default is ´true´).
+`yesOrNope`: boolean (default is `true`).
 
 
-### ´.cmdOrCtrl( yesOrNope )´
+### `.cmdOrCtrl( yesOrNope )`
 
 Tells kDown to consider equals the cmd and ctrl keys. 
 
-´yesOrNope´: boolean (default is ´true´).
+`yesOrNope`: boolean (default is `true`).
 
 
-### ´.logKeyCodes( yesOrNope )´
+### `.logKeyCodes( yesOrNope )`
 
 Tells kDown to log key codes for each key pressed. 
 
-´yesOrNope´: boolean (default is ´false´).
+`yesOrNope`: boolean (default is `false`).
 
-### ´.preventDefault( yesOrNope )´
+### `.preventDefault( yesOrNope )`
 
 Tells kDown whether to prevent default behavior of a given combo or not
 
-´yesOrNope´: boolean (default is ´true´).
+`yesOrNope`: boolean (default is `true`).
 
-### ´.config( userConfig )´
+### `.config( userConfig )`
 
 A shortcut to access kDown's config methods
 
-´userConfig´: obejct.
+`userConfig`: obejct.
 
 #### Example
 
