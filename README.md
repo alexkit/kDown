@@ -20,7 +20,7 @@ The `whenShortcut` method should be used only to listen to, well, shortcuts (zer
 
 * `keys` can be one of the following:
     * a "+" delimited string ( "alt+a" )
-    * an array of strings and/or key codes and/or arrays ( ["alt","shift","a"], ["alt","shift",65], [18,16,65], [18,"shift",65], [ "alt",["a","b","c"]] (which means "alt" + either "a" or "b" or "c") )
+    * an array of strings and/or key codes and/or arrays ( ["alt","shift","a"], ["alt","shift",65], [18,16,65], [18,"shift",65], ["alt",["a","b","c"]]–which means "alt" + either "a" or "b" or "c")
     * a single key code ( 65 ) (works only if you're targeting one specific key)
 * `callback` accepts one argument: the `event` object.
 * `context` is an HTML Object. Useful when you want to fire `callback` only in specific contexts.
