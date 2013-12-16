@@ -136,6 +136,8 @@ p {
 	<i>Open your console, and watch <a href="https://github.com/alexduloz/kDown">kDown.js</a> in action</i>
 </p>
 
+<p>Please note that some public methods used internally by kDown are not exemplified below. You will, however, <a href="https://github.com/alexduloz/kDown">find them in the GitHub docs</a>.</p>
+
 <h2>The <code>whenShortcut</code> method</h2>
 
 <p>
@@ -144,13 +146,11 @@ p {
 
 <ul>
 
-
-
 <li>
 <h3>Press <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>shift</kbd> + <kbd>a</kbd></h3>
 <pre>
 <code>
-kDown.whenShortcut(&quot;ctrl+alt+shift+a&quot;,function(){
+kDown.whenShortcut(&quot;ctrl+alt+shift+a&quot;, function(e){
     console.log(&quot;ctrl+alt+shift+a&quot;);
 });
 </code>
@@ -162,7 +162,7 @@ kDown.whenShortcut(&quot;ctrl+alt+shift+a&quot;,function(){
 <p>If you don't have a Mac, you can replace <kbd>cmd</kbd> with <kbd>ctrl</kbd> since <code>kDown.cmdOrCtrl(true)</code> is the default behavior.</p>
 <pre>
 <code>
-kDown.whenShortcut(&quot;cmd+alt+shift+b&quot;,function(){
+kDown.whenShortcut(&quot;cmd+alt+shift+b&quot;, function(e){
     console.log(&quot;cmd+alt+shift+b&quot;);
 });
 </code>
@@ -173,14 +173,185 @@ kDown.whenShortcut(&quot;cmd+alt+shift+b&quot;,function(){
 <h3>Press <kbd>ctrl</kbd> + <kbd>m</kbd> or <kbd>n</kbd> or <kbd>o</kbd></h3>
 <pre>
 <code>
-kDown.whenShortcut([&quot;ctrl&quot;,[&quot;m&quot;,&quot;n&quot;,&quot;o&quot;]],function(){
+kDown.whenShortcut([&quot;ctrl&quot;,[&quot;m&quot;,&quot;n&quot;,&quot;o&quot;]], function(e){
     console.log(&quot;ctrl+m|n|o&quot;);
 });
 </code>
 </pre>
 </li>
 
+<li>
+<h3>Press <kbd>e</kbd> or <kbd>f</kbd> or <kbd>g</kbd></h3>
+<pre>
+<code>
+kDown.whenShortcut([[&quot;e&quot;,&quot;f&quot;,&quot;g&quot;]], function(e){
+    console.log(&quot;whenShortcut: e|f|g&quot;);
+});
+</code>
+</pre>
+</li>
 
+</ul>
+
+<p>To stop firing a given callback, simply pass <code>null</code> as the callback value:</p>
+<pre>
+<code>
+kDown.whenShortcut([[&quot;e&quot;,&quot;f&quot;,&quot;g&quot;]], null);
+</code>
+</pre>
+
+<h2>The <code>whenDown</code> method</h2>
+
+<p>
+	The <code>whenDown</code> method is used when you want to listen to more complex key combinations.
+</p>
+
+<ul>
+<li>
+<h3>Press <kbd>m</kbd>+<kbd>n</kbd>+<kbd>o</kbd></h3>
+<pre>
+<code>
+kDown.whenDown([[&quot;m&quot;,&quot;n&quot;,&quot;o&quot;]], function(e){
+    console.log(&quot;when down: m|n|o&quot;);
+});
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press <kbd>a</kbd> and <kbd>x</kbd>, <kbd>y</kbd> or <kbd>z</kbd></h3>
+<pre>
+<code>
+kDown.whenDown([&quot;a&quot;,[&quot;x&quot;,&quot;y&quot;,&quot;z&quot;]], function(e){
+    console.log(&quot;when down: a+x|y|z&quot;);
+});
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press <kbd>esc</kbd></h3>
+<pre>
+<code>
+kDown.whenDown(&quot;esc&quot;, function(e){
+    console.log(&quot;escape with 'esc'&quot;);
+});
+
+// aliased string
+kDown.whenDown(&quot;escape&quot;, function(e){
+    console.log(&quot;escape with 'escape'&quot;);
+});
+</code>
+</pre>
+</li>
+
+<li>
+<h3>Press the <kbd>&darr;</kbd> key (down arrow) to see a single key code used, and the optional <code>event</code> (aliased <code>e</code> below) argument in action</h3>
+<pre>
+<code>
+kDown.whenDown(40, function(e){
+    console.log(&quot;down arrow with one single keyCode: &quot; + e.which);
+});
+</code>
+</pre>
+</li>
+
+</ul>
+
+<p>To stop firing a given callback, simply pass <code>null</code> as the callback value:</p>
+<pre>
+<code>
+kDown.whenDown(40, null);
+</code>
+</pre>
+
+<h2>The <code>whenXpress</code> method</h2>
+
+<p>
+    The <code>whenXpress</code> method monitors the number of times a key is pressed whithin a certain amount of time, and fires <code>callback</code> accordingly. This method is useful if you want to create &quot;double-click&quot; effects.
+</p>
+
+<ul>
+<li>
+<h3>Double-click on <kbd>q</kbd></h3>
+<pre>
+<code>
+kDown.whenXpress(&quot;q&quot;, function(e){
+    console.log(&quot;'q' double-click&quot;);
+});
+</code>
+</pre>
+
+<p>To stop firing a given callback, simply pass <code>null</code> as the callback value:</p>
+<pre>
+<code>
+kDown.whenXpress(&quot;q&quot;, null);
+</code>
+</pre>
+
+<h4>Default settings</h4>
+
+<p>By default, <code>whenXpress</code> listens to <code>2</code> occurences of the same key whithin <code>220</code> milliseconds. You can obviously change these settings:</p>
+
+<pre>
+<code>
+kDown.whenXpress(&quot;w&quot;, function(e){
+    console.log(&quot;'w' pressed three times during the last 1000 milliseconds&quot;);
+}, 3, 1000);
+</code>
+</pre>
+
+
+<h4><code>strict</code> vs <code>loose</code></h4>
+
+<p>The <code>whenXpress</code> method will fire <code>callback</code> <em>only</em> if the given combo is pressed <em>exactly</em> <code>n</code> times. This is know is as <code>strict</code> mode, and it's <code>whenXpress</code>'s default mode.</p>
+
+<p>Here's what is implicitely happening:</p>
+
+<pre>
+<code>
+kDown.whenXpress(&quot;w&quot;, function(e){
+    console.log(&quot;'w' pressed three times during the last 1000 milliseconds&quot;);
+}, 3, 1000, "strict");
+</code>
+</pre>
+
+<p>You can switch to a <code>loose</code> approach like that:</p>
+
+<pre>
+<code>
+kDown.whenXpress(&quot;left&quot;, function(e){
+    console.log(&quot;'left arrow' pressed at least three times during the last 1000 milliseconds&quot;);
+}, 3, 1000, &quot;loose&quot;);
+</code>
+</pre>
+
+</li>
+</ul>
+
+<h2>Stacking callbacks</h2>
+
+<p>kDown lets you stack callbacks for a given combo:</p>
+
+<pre>
+<code>
+kDown.whenDown(&quot;v&quot;, function(e){
+    console.log(&quot;first callback&quot;);
+});
+kDown.whenDown(&quot;v&quot;, function(e){
+    console.log(&quot;second callback&quot;);
+});
+</code>
+</pre>
+
+
+<h2>The <code>context</code> method</h2>
+
+<p>
+    The <code>context</code> method lets you limit the scope of a given shortcut to a given context.
+</p>
+
+<ul>
 <li>
 <h3>Press <kbd>enter</kbd> inside and outside textareas</h3>
 <div class="some-air">
@@ -194,99 +365,171 @@ kDown.whenShortcut([&quot;ctrl&quot;,[&quot;m&quot;,&quot;n&quot;,&quot;o&quot;]
 kDown.whenShortcut(&quot;enter&quot;,function(e){
     console.log(&quot;enter inside #textarea1&quot;);
     console.log(e.target);
-    },document.getElementById(&quot;textarea1&quot;));
+})
+.context(document.getElementById(&quot;textarea1&quot;));
     
-    kDown.whenShortcut(&quot;enter&quot;,function(){
-        console.log(&quot;enter inside #textarea2&quot;);
-    },document.getElementById(&quot;textarea2&quot;));
+kDown.whenShortcut(&quot;enter&quot;,function(){
+    console.log(&quot;enter inside #textarea2&quot;);
+})
+.context(document.getElementById(&quot;textarea2&quot;));
     
-    kDown.whenShortcut(&quot;enter&quot;,function(){
-        console.log(&quot;enter inside a textarea&quot;);
-    },document.getElementsByTagName(&quot;textarea&quot;));
+kDown.whenShortcut(&quot;enter&quot;,function(){
+    console.log(&quot;enter inside a textarea&quot;);
+})
+.context(document.getElementsByTagName(&quot;textarea&quot;));
     
-    kDown.whenShortcut(&quot;enter&quot;,function(){
-        console.log(&quot;enter was pressed outside textareas&quot;);
-    },document.getElementsByTagName(&quot;body&quot;)[0]);
+kDown.whenShortcut(&quot;enter&quot;,function(){
+    console.log(&quot;enter was pressed outside textareas&quot;);
+})
+.context(document.getElementsByTagName(&quot;body&quot;)[0]);
 </code>
 </pre>
-</li>
 
-<li>
-<h3>Press <kbd>e</kbd> or <kbd>f</kbd> or <kbd>g</kbd></h3>
-<pre>
-<code>
-kDown.whenDown([[&quot;x&quot;,&quot;y&quot;,&quot;z&quot;]],function(){
-    console.log(&quot;when down: x|y|z&quot;);
-});
-</code>
-</pre>
-</li>
+<p>The <code>context</code> method works with the following methods: <code>whenShortcut</code>, <code>whenDown</code>, <code>whenXpress</code>.</p>
 
+</li>
 </ul>
 
-<h2>The <code>whenDown</code> method</h2>
+
+
+<h2>The <code>condition</code> method</h2>
 
 <p>
-	The <code>whenDown</code> method is used when you want to listen to more complex key combinations.
+    The <code>condition</code> method tells kDown to evaluate a function and fire <code>callback</code> <em>only</em> if this function returns <code>true</code>.
 </p>
 
 <ul>
-
 <li>
-<h3>Press <kbd>m</kbd>+<kbd>n</kbd>+<kbd>o</kbd></h3>
+<h3>Press <kbd>1</kbd> to toggle the condition, and then <kbd>2</kbd> to actually test it.</h3>
+
 <pre>
 <code>
-kDown.whenDown([[&amp;quot;x&amp;quot;,&amp;quot;y&amp;quot;,&amp;quot;z&amp;quot;]],function(){
-    console.log(&amp;quot;when down: x|y|z&amp;quot;);
+var ok = false;
+kDown.whenShortcut(&quot;1&quot;, function(e){
+    if (!ok) {
+        ok = true;
+        console.log(&quot;condition will now return true&quot;);
+    } else {
+        ok = false;
+        console.log(&quot;condition will now return false&quot;);
+    }
 });
+
+kDown.whenShortcut(&quot;shift+2&quot;, function(e){
+    console.log(&quot;it was ok to call me&quot;);
+})
+.condition(function(e){
+    return ok;
+});
+</code>
+</pre>
+
+<p>The <code>event</code> object is available in <code>condition</code>'s callback.</p>
+
+</li>
+</ul>
+
+<p>The <code>condition</code> method works with the following methods: <code>whenShortcut</code>, <code>whenDown</code>, <code>whenXpress</code>.</p>
+
+<h2>The <code>key</code> method</h2>
+
+<p>
+    The <code>key</code> method associates keys to a specific methods/combos. Its only use is with the <code>shut</code> method (see below).
+</p>
+
+<p>The <code>key</code> method works with the following methods: <code>whenShortcut</code>, <code>whenDown</code>, <code>whenXpress</code>.</p>
+
+
+<h2>The <code>shut</code> method</h2>
+
+<p>
+    The <code>shut</code> method deletes callbacks associated to given methods/combos. It gives you greater control over what you want to delete than just passing <code>null</code> as the callback value.
+</p>
+
+<ul>
+<li>
+<h3>Deletes all kDown's callbacks</h3>
+
+<pre>
+<code>
+kDown.shut();
 </code>
 </pre>
 </li>
 
 <li>
-<h3>Press <kbd>a</kbd> and <kbd>x</kbd>, <kbd>y</kbd> or <kbd>z</kbd></h3>
+<h3>Deletes all the callbacks of a specific method</h3>
+
 <pre>
 <code>
-kDown.whenDown([&quot;a&quot;,[&quot;x&quot;,&quot;y&quot;,&quot;z&quot;]],function(){
-    console.log(&quot;when down: a+x|y|z&quot;);
-});
+kDown.shut(&quot;whenDown&quot;);
 </code>
 </pre>
 </li>
 
 <li>
-<h3>Press <kbd>esc</kbd></h3>
+<h3>Deletes all the callbacks of a specific method/combo</h3>
+
 <pre>
 <code>
-kDown.whenDown(&quot;esc&quot;,function(){
-    console.log(&quot;escape with 'esc'&quot;);
-});
-
-// aliased string
-kDown.whenDown(&quot;escape&quot;,function(){
-    console.log(&quot;escape with 'escape'&quot;);
-});
+kDown.shut(&quot;whenDown&quot;, &quot;a+b+c&quot;);
 </code>
 </pre>
 </li>
 
 <li>
-<h3>Press the <kbd>&darr;</kbd> key (down arrow) to see a single key code used, and the optional <code>event</code> argument in action</h3>
+<h3>Deletes only the callbacks of a specific method/combo using a specific key set with the <code>key</code> method</h3>
+
 <pre>
 <code>
-kDown.whenDown(40,function(event){
-    console.log(&quot;down arrow with one single keyCode: &quot; + event.which);
+kDown.whenDown(&quot;a+b+c&quot;, function(){
+    console.log(&quot;first callback&quot;);
 });
+
+kDown.whenDown(&quot;a+b+c&quot;, function(){
+    console.log(&quot;second callback&quot;);
+})
+.key(&quot;myKey&quot;);
+
+kDown.shut(&quot;whenDown&quot;, &quot;a+b+c&quot;, &quot;myKey&quot;);
+// Now, only the first callback will be fired
 </code>
 </pre>
 </li>
 
 </ul>
+
+<h2>The <code>always</code> method</h2>
+
+<p>If you rely heavily on kDown to enhance your projects, you will find yourself running common tasks for every combo (checking if modal boxes are open and things like that). The <code>always</code> method, as its name suggests, lets you associate a function to all your callbacks. This function will be called every time a combo is fired.</p>
+
+<pre>
+<code>
+kDown.always(function(e) {
+  console.log(&quot;a combo has been fired!&quot;);  
+});
+</code>
+</pre>
+
+<p>You can pile up callbaks:</p>
+
+<pre>
+<code>
+kDown.always(function(e) {
+  console.log(&quot;a combo has been fired!&quot;);  
+});
+
+kDown.always(function(e) {
+  console.log(&quot;Happy to know!&quot;);  
+});
+</code>
+</pre>
+
 
 <h2>The <code>isShortcut</code> and <code>isDown</code> methods</h2>
 
 <p>
-	The <code>isShortcut</code> and <code>isDown</code> methods are used internally by the <code>whenShortcut</code> and <code>whenDown</code> methods. If you want, you can use them directly in event handlers.
+	The <code>isShortcut</code> and <code>isDown</code> methods are used internally by the <code>whenShortcut</code>, <code>whenDown</code> and <code>whenXpress</code> methods. If you want, you can use them directly in event handlers.
 </p>
 
 <ul>
@@ -354,7 +597,7 @@ document.addEventListener(&quot;keydown&quot;,function(event){
 </p>
 </div>
 </body>    
-    <script src="./kDown.min.js"></script>
+    <script src="./kDown.js"></script>
     <script>
 
     kDown.whenShortcut("ctrl+alt+shift+a",function(){
@@ -375,29 +618,29 @@ document.addEventListener(&quot;keydown&quot;,function(event){
     kDown.whenShortcut("enter",function(e){
     	console.log("enter inside #textarea1");
     	console.log(e.target);
-    },document.getElementById("textarea1"));
+    })
+    .context(document.getElementById("textarea1"));
     
     
     kDown.whenShortcut("enter",function(){
     	console.log("enter inside #textarea2");
-    },document.getElementById("textarea2"));
+    }).context(document.getElementById("textarea2"));
     
     
     kDown.whenShortcut("enter",function(){
     	console.log("enter inside a textarea");
-    },document.getElementsByTagName("textarea"));
+    }).context(document.getElementsByTagName("textarea"));
     
     
     kDown.whenShortcut("enter",function(){
     	console.log("enter was pressed outside textareas");
-    },document.getElementsByTagName("body")[0]);
+    }).context(document.getElementsByTagName("body")[0]);
     
     
     kDown.whenDown(["a",["x","y","z"]],function(){
     	console.log("when down: a+x|y|z");
     });
-    
-    
+
     kDown.whenDown("m+n+o",function(event){
 		console.log("m+n+o");
 	});
@@ -416,9 +659,43 @@ document.addEventListener(&quot;keydown&quot;,function(event){
     kDown.whenDown(40,function(event){
 		console.log("down arrow with one single keyCode: " + event.which);
 	});
+
+    kDown.whenXpress("q", function(){
+        console.log("'q' double-click");
+    });
+
+    kDown.whenXpress("w", function(e){
+        console.log("'w' pressed exactly three times during the last 1000 milliseconds");
+    }, 3, 1000, 'strict');
 	
+    kDown.whenXpress("left", function(e){
+        console.log("'left' pressed at least three times during the last 1000 milliseconds");
+    }, 3, 1000, 'loose');
 	
-	
+	var ok = false;
+    kDown.whenShortcut("1", function(e){
+        if (!ok) {
+            ok = true;
+            console.log("condition will now return true");
+        } else {
+            ok = false;
+            console.log("condition will now return false");
+        }
+    });
+
+    kDown.whenShortcut("2", function(e){
+        console.log("it was ok to call me");
+    })
+    .condition(function(e){
+        return ok;
+    });
+
+    kDown.whenDown("v", function(e){
+        console.log("first callback");
+    });
+    kDown.whenDown("v", function(e){
+        console.log("second callback");
+    });
     
     document.addEventListener("keydown",function(event){
 	    

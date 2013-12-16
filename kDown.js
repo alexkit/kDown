@@ -1,5 +1,5 @@
-/**
- * kDown 1.0.0
+/*!
+ * kDown 2.0.0
  * @author Alex Duloz ~ @alexduloz
  * MIT license
  *
@@ -38,17 +38,55 @@
 
             this._preventDefault = true;
 
+            this._always = [];
+
+            this._currentMethod;
+
             this._whenDownKeys = [];
 
             this._whenDownCallback = [];
 
             this._whenDownContext = [];
 
+            this._whenDownCondition = [];
+
+            this._whenDownKey = [];
+
             this._whenShortcutKeys = [];
 
             this._whenShortcutCallback = [];
 
             this._whenShortcutContext = [];
+
+            this._whenShortcutCondition = [];
+
+            this._whenShortcutKey = [];
+
+            this._whenXpressKeys = [];
+
+            this._whenXpressCallback = [];
+
+            this._whenXpressDefaultN = 2 // default;
+
+            this._whenXpressN = [];
+
+            this._whenXpressContext = [];
+
+            this._whenXpressDefaultMilliseconds = 220; // default
+
+            this._whenXpressMilliseconds = [];
+
+            this._whenXpressListening = [];
+
+            this._whenXpressTrigger = [];
+
+            this._whenXpressCondition = [];
+
+            this._whenXpressKey = [];
+
+            this._whenXpressStrictOrLoose = [];
+
+            this._whenXpressDefaultStrictOrLoose = "strict";
 
             this._event;
 
@@ -77,7 +115,10 @@
                 // Arrows
                 37, 38, 39, 40, 37, 38, 39, 40,
                 // Modifiers
-                18, 18, 17, 17, 16, 16, [224, 17, 91, 93], [224, 17, 91, 93], [224, 17, 91, 93], [224, 17, 91, 93],
+                18, 18, 17, 17, 16, 16, [224, 17, 91, 93],
+                [224, 17, 91, 93],
+                [224, 17, 91, 93],
+                [224, 17, 91, 93],
                 // Misc (tab, del, esc...)
                 8, 8, 46, 35, 13, 27, 27, 36, 45, 33, 34, 9, 32
             ];
@@ -120,6 +161,10 @@
 
                 self._event = event;
 
+                //
+                // whenShortcut
+                //
+
                 var whenShortcutKeysLength = self._whenShortcutKeys.length;
 
                 if (whenShortcutKeysLength > 0) {
@@ -149,14 +194,82 @@
                                 }
                             }
 
+                            if (self._whenShortcutCondition[k]) {
+                                if (!self._whenShortcutCondition[k](self._event)) {
+                                    fireCallback = false;
+                                }
+                            }
+
                             if (fireCallback === true) {
                                 if (self.isFunction(self._whenShortcutCallback[k])) {
                                     self._whenShortcutCallback[k](self._event);
+                                    for (var i = 0; i < self._always.length; i++) {
+                                        self._always[i](self._whenShortcutKeys[k]);
+                                    };
                                 }
                             }
                         }
                     }
                 }
+
+                //
+                // whenXpress
+                //
+
+                var whenXpressKeysLength = self._whenXpressKeys.length;
+
+                if (whenXpressKeysLength > 0) {
+                    for (var k = 0; k < whenXpressKeysLength; k++) {
+                        if (self.isShortcut(self._whenXpressKeys[k])) {
+
+                            self._whenXpressTrigger[k](k, function(k) {
+                                // Assume a callback will be fired
+                                var fireCallback = true;
+
+                                // Is our current combination bound to a certain context?
+                                if (self._whenXpressContext[k]) {
+
+                                    var l = self._whenXpressContext[k].length;
+
+                                    // Since we have a context, callback must be proven
+                                    fireCallback = false;
+
+                                    for (var i = 0; i < l; i++) {
+                                        if ( !! (self._whenXpressContext[k][i] && self._whenXpressContext[k][i].nodeType === 1)) {
+                                            if (event.target.getAttribute("data-whenxpress-context-" + k) === null || +event.target.getAttribute("data-whenxpress-context-" + k) !== i) {
+                                                if (fireCallback === true) {
+                                                    continue;
+                                                }
+                                            } else {
+                                                fireCallback = true;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (self._whenXpressCondition[k]) {
+                                    if (!self._whenXpressCondition[k](self._event)) {
+                                        fireCallback = false;
+                                    }
+                                }
+
+                                if (fireCallback === true) {
+                                    if (self.isFunction(self._whenXpressCallback[k])) {
+                                        self._whenXpressCallback[k](self._event);
+                                        for (var i = 0; i < self._always.length; i++) {
+                                            self._always[i](self._whenXpressKeys[k]);
+                                        };
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+
+
+                //
+                // whenDown
+                //
 
                 // The cmd key prevents us from counting keys and is only allowed
                 // for shortcuts (modifiers + one "regular" key).
@@ -203,9 +316,18 @@
                                 }
                             }
 
+                            if (self._whenDownCondition[k]) {
+                                if (!self._whenDownCondition[k](self._event)) {
+                                    fireCallback = false;
+                                }
+                            }
+
                             if (fireCallback === true) {
                                 if (self.isFunction(self._whenDownCallback[k])) {
                                     self._whenDownCallback[k](self._event);
+                                    for (var i = 0; i < self._always.length; i++) {
+                                        self._always[i](self._whenDownKeys[k]);
+                                    };
                                 }
                             }
                         }
@@ -379,8 +501,8 @@
                 return false;
             }
 
-			var found = 0;
-			var yo = [];
+            var found = 0;
+            var yo = [];
 
             for (var k = 0; k < toAnalyzeLength; k++) {
                 // shiftKey
@@ -392,7 +514,7 @@
                     found++;
                 }
                 // ctrlKey || metaKey
-                else if ( (self._cmdOrCtrl === true) && ( toAnalyze[k] === 17 || (this.isArray(toAnalyze[k])) && toAnalyze[k].toString() === [224, 17, 91, 93].toString() ) ) { 
+                else if ((self._cmdOrCtrl === true) && (toAnalyze[k] === 17 || (this.isArray(toAnalyze[k])) && toAnalyze[k].toString() === [224, 17, 91, 93].toString())) {
                     if (event.metaKey || event.ctrlKey) {
                         found++;
                     }
@@ -405,7 +527,7 @@
                     }
                 }
                 // metaKey only
-                else if (self._cmdOrCtrl === false && ( (this.isArray(toAnalyze[k])) && toAnalyze[k].toString() === [224, 17, 91, 93].toString() ) ) {
+                else if (self._cmdOrCtrl === false && ((this.isArray(toAnalyze[k])) && toAnalyze[k].toString() === [224, 17, 91, 93].toString())) {
                     if (event.metaKey) {
                         found++;
                     }
@@ -414,7 +536,7 @@
                     found++;
                 }
             }
-			return ( found === toAnalyzeLength );
+            return (found === toAnalyzeLength);
         },
 
         /**
@@ -431,23 +553,19 @@
          * @param {HTMLElement} context
          * @return {kDown}
          */
-        whenShortcut: function(keys, callback, context) {
-            this._whenShortcutKeys.push(keys);
-            this._whenShortcutCallback.push(callback);
+        whenShortcut: function(keys, callback) {
+            self._currentMethod = "whenShortcut";
 
-            if (context) {
-                // We must be able to loop through our context
-                var context = (toString.call(context) !== "[object HTMLCollection]") ? new Array(context) : context,
-                    lastId = (this._whenShortcutKeys.length - 1),
-                    l = context.length;
-                for (var i = 0; i < l; i++) {
-                    if ( !! (context[i] && context[i].nodeType === 1)) {
-                        context[i].setAttribute("data-whenshortcut-context-" + lastId, i);
-                    }
-                }
+            //kill
+            if (!callback) {
+                self.shut("whenShortcut", keys);
             }
 
-            this._whenShortcutContext.push(context);
+            this._whenShortcutKeys.push(keys);
+            this._whenShortcutCallback.push(callback);
+            this._whenShortcutCondition.push(null);
+            this._whenShortcutKey.push(null);
+            this._whenShortcutContext.push(null);
 
             return this;
         },
@@ -470,14 +588,14 @@
          * work with combinations involving the cmd key.
          * You should use the isShortcut method instead.
          *
-         * More on the command key: 
+         * More on the command key:
          * http://bitspushedaround.com/on-a-few-things-you-may-not-know-about-the-hellish-command-key-and-javascript-events
          *
          * @param {Integer|String|Array} keys
          * @param {Event=} [event]
          * @return {Boolean}
          */
-        isDown: function(keys, event) {
+        isDown: function(keys, event, debug) {
             var event = event || self._event;
 
             var toAnalyze = this.format(keys);
@@ -521,27 +639,310 @@
          * include it inside an event handler.
          *
          * @param {Integer|String|Array} keys
-         * @param {function([event])} callback
+         * @param {function([event])|NULL} callback
          * @param {HTMLElement} context
          * @return {Object}
          */
         whenDown: function(keys, callback, context) {
+            self._currentMethod = "whenDown";
+
+            //kill
+            if (!callback) {
+                self.shut("whenDown", keys);
+            }
+
             this._whenDownKeys.push(keys);
             this._whenDownCallback.push(callback);
+            this._whenDownCondition.push(null);
+            this._whenDownKey.push(null);
+            this._whenDownContext.push(null);
 
-            if (context) {
+            return this;
+        },
+
+        /**
+         * Fires callback if a key is pressed x times within x milliseconds
+         *
+         * This method works as a standalone. No need to
+         * include it inside an event handler.
+         *
+         * @param {Integer|String} key (single key)
+         * @param {Integer} n (how many times the key is pressed)
+         * @param {function([event])|NULL} callback
+         * @param {HTMLElement} context
+         * @param {Integer} milliseconds
+         * @return {Object}
+         */
+        whenXpress: function(keys, callback, n, milliseconds, strictOrLoose) {
+            self._currentMethod = "whenXpress";
+
+            //kill
+            if (!callback) {
+                self.shut("whenXpress", keys);
+            }
+
+            n = n || self._whenXpressDefaultN;
+            milliseconds = milliseconds || self._whenXpressDefaultMilliseconds;
+            strictOrLoose = strictOrLoose || self._whenXpressDefaultStrictOrLoose;
+
+            this._whenXpressKeys.push(keys);
+            this._whenXpressN.push(n);
+            this._whenXpressCallback.push(callback);
+            this._whenXpressMilliseconds.push(milliseconds);
+            this._whenXpressStrictOrLoose.push(strictOrLoose);
+            this._whenXpressListening.push(false);
+            this._whenXpressCondition.push(null);
+            this._whenXpressKey.push(null);
+            this._whenXpressContext.push(null);
+
+            this._whenXpressTrigger.push(function(k, callback) {
+
+                if (self._whenXpressListening[k] === false) {
+                    self._whenXpressListening[k] = 1;
+                    setTimeout(function() {
+                        if (self._whenXpressStrictOrLoose[k] === "strict") {
+                            if (self._whenXpressN[k] === self._whenXpressListening[k]) {
+                                callback(k);
+                            }
+                        }
+                        if (self._whenXpressStrictOrLoose[k] === "loose") {
+                            if (self._whenXpressN[k] <= self._whenXpressListening[k]) {
+                                callback(k);
+                            }
+                        }
+                        self._whenXpressListening[k] = false;
+                    }, self._whenXpressMilliseconds[k]);
+                } else {
+                    self._whenXpressListening[k]++;
+                }
+            });
+
+            return this;
+        },
+
+        always: function(func) {
+            self._always.push(func);
+            return this;
+        },
+
+        // Yes, this could be refactored...
+        context: function(context) {
+            if (!self._currentMethod) {
+                return;
+            }
+
+            // current method
+            if (self._currentMethod === "whenDown") {
                 // We must be able to loop through our context
-                var context = (toString.call(context) !== "[object HTMLCollection]") ? new Array(context) : context,
-                    lastId = (this._whenDownKeys.length - 1),
-                    l = context.length;
+                var context = (toString.call(context) !== "[object HTMLCollection]") ? new Array(context) : context;
+                var lastId = (self._whenDownKeys.length - 1);
+                var l = context.length;
                 for (var i = 0; i < l; i++) {
                     if ( !! (context[i] && context[i].nodeType === 1)) {
                         context[i].setAttribute("data-whendown-context-" + lastId, i);
                     }
                 }
+                self._whenDownContext[lastId] = context;
             }
 
-            this._whenDownContext.push(context);
+            // current method
+            if (self._currentMethod === "whenShortcut") {
+                // We must be able to loop through our context
+                var context = (toString.call(context) !== "[object HTMLCollection]") ? new Array(context) : context;
+                var lastId = (self._whenShortcutKeys.length - 1);
+                var l = context.length;
+                for (var i = 0; i < l; i++) {
+                    if ( !! (context[i] && context[i].nodeType === 1)) {
+                        context[i].setAttribute("data-whenshortcut-context-" + lastId, i);
+                    }
+                }
+                self._whenShortcutContext[lastId] = context;
+            }
+
+            // current method
+            if (self._currentMethod === "whenXpress") {
+                // We must be able to loop through our context
+                var context = (toString.call(context) !== "[object HTMLCollection]") ? new Array(context) : context;
+                var lastId = (self._whenXpressKeys.length - 1);
+                var l = context.length;
+                for (var i = 0; i < l; i++) {
+                    if ( !! (context[i] && context[i].nodeType === 1)) {
+                        context[i].setAttribute("data-whenxpress-context-" + lastId, i);
+                    }
+                }
+                self._whenXpressContext[lastId] = context;
+            }
+
+            return this;
+
+        },
+
+        condition: function(func) {
+            if (!self._currentMethod) {
+                return;
+            }
+
+            // current method
+            if (self._currentMethod === "whenDown") {
+                var lastId = (self._whenDownKeys.length - 1);
+                self._whenDownCondition[lastId] = func;
+            }
+
+            if (self._currentMethod === "whenShortcut") {
+                var lastId = (self._whenShortcutKeys.length - 1);
+                self._whenShortcutCondition[lastId] = func;
+            }
+
+            if (self._currentMethod === "whenXpress") {
+                var lastId = (self._whenXpressKeys.length - 1);
+                self._whenXpressCondition[lastId] = func;
+            }
+
+            return this;
+
+        },
+
+        key: function(key) {
+            if (!self._currentMethod) {
+                return;
+            }
+
+            // current method
+            if (self._currentMethod === "whenDown") {
+                var lastId = (self._whenDownKeys.length - 1);
+                self._whenDownKey[lastId] = key;
+            }
+
+            if (self._currentMethod === "whenShortcut") {
+                var lastId = (self._whenShortcutKeys.length - 1);
+                self._whenShortcutKey[lastId] = key;
+            }
+
+            if (self._currentMethod === "whenXpress") {
+                var lastId = (self._whenXpressKeys.length - 1);
+                self._whenXpressKey[lastId] = key;
+            }
+
+            return this;
+
+        },
+
+        /**
+         * Quits listening.
+         *
+         * @return {Object}
+         */
+        shut: function(method, keys, key) {
+
+            if (!method) {
+                for (var i = 0; i < self._whenDownKeys.length; i++) {
+                    self._shutMethod("whenDown", i);
+                }
+                for (var i = 0; i < self._whenShortcutKeys.length; i++) {
+                    self._shutMethod("whenShortcut", i);
+                }
+                for (var i = 0; i < self._whenXpressKeys.length; i++) {
+                    self._shutMethod("whenXpress", i);
+                }
+            }
+
+            if (method === "whenDown") {
+                if (!keys) {
+                    for (var i = 0; i < self._whenDownKeys.length; i++) {
+                        if ((key) && key !== self._whenDownKey[i]) {
+                            continue;
+                        }
+                        self._shutMethod("whenDown", i);
+                    }
+                    return this;
+                }
+
+                for (var i = 0; i < self._whenDownKeys.length; i++) {
+                    if (keys === self._whenDownKeys[i]) {
+                        if ((key) && key !== self._whenDownKey[i]) {
+                            continue;
+                        }
+                        self._shutMethod("whenDown", i);
+                    }
+                }
+                return this;
+            }
+
+            if (method === "whenShortcut") {
+                if (!keys) {
+                    for (var i = 0; i < self._whenShortcutKeys.length; i++) {
+                        if ((key) && key !== self._whenShortcutKey[i]) {
+                            continue;
+                        }
+                        self._shutMethod("whenShortcut", i);
+                    }
+                    return this;
+                }
+
+                for (var i = 0; i < self._whenShortcutKeys.length; i++) {
+                    if (keys === self._whenShortcutKeys[i]) {
+                        if ((key) && key !== self._whenShortcutKey[i]) {
+                            continue;
+                        }
+                        self._shutMethod("whenShortcut", i);
+                    }
+                    return this;
+                }
+            }
+
+            if (method === "whenXpress") {
+                if (!keys) {
+                    for (var i = 0; i < self._whenXpressKeys.length; i++) {
+                        if ((key) && key !== self._whenXpressKey[i]) {
+                            continue;
+                        }
+                        self._shutMethod("whenXpress", i);
+
+                    }
+                    return this;
+                }
+                for (var i = 0; i < self._whenXpressKeys.length; i++) {
+                    if (keys === self._whenXpressKeys[i]) {
+                        if ((key) && key !== self._whenXpressKey[i]) {
+                            continue;
+                        }
+                        self._shutMethod("whenXpress", i);
+                    }
+                    return this;
+                }
+            }
+
+            return this;
+        },
+
+        shutMethod: function(method, i) {
+            if (method === "whenDown") {
+                self._whenDownKeys.splice(i, 1);
+                self._whenDownCallback.splice(i, 1);
+                self._whenDownContext.splice(i, 1);
+                self._whenDownCondition.splice(i, 1);
+                self._whenDownKey.splice(i, 1);
+            }
+
+            if (method === "whenShortcut") {
+                self._whenShortcutKeys.splice(i, 1);
+                self._whenShortcutCallback.splice(i, 1);
+                self._whenShortcutContext.splice(i, 1);
+                self._whenShortcutCondition.splice(i, 1);
+                self._whenShortcutKey.splice(i, 1);
+            }
+
+            if (method === "whenXpress") {
+                self._whenXpressKeys.splice(i, 1);
+                self._whenXpressCallback.splice(i, 1);
+                self._whenXpressN.splice(i, 1);
+                self._whenXpressContext.splice(i, 1);
+                self._whenXpressMilliseconds.splice(i, 1);
+                self._whenXpressListening.splice(i, 1);
+                self._whenXpressTrigger.splice(i, 1);
+                self._whenXpressCondition.splice(i, 1);
+                self._whenXpressKey.splice(i, 1);
+            }
 
             return this;
         },
@@ -693,7 +1094,7 @@
 
             return (toCompare1 === toCompare2);
         },
-        
+
         // A few utilities
 
         /**
